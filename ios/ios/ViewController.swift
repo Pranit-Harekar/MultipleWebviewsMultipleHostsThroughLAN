@@ -7,18 +7,21 @@
 
 import UIKit
 import CocoaAsyncSocket
+import Alamofire
 
-class ViewController: UIViewController, GCDAsyncUdpSocketDelegate {
+class ViewController: UIViewController, GCDAsyncUdpSocketDelegate, UITextFieldDelegate {
 
     static let queue = DispatchQueue(label: "com.pranitharekar.CFDDetector", attributes: [])
 
     let broadcastPort: UInt16 = 9997
     let broadcastHost: String = "255.255.255.255"
     let broadcastTimeout = 1.0
-    let disconnectAfter = 5.0
+    let disconnectAfter = 1.0
     var socket: GCDAsyncUdpSocket!
     var stopDiscovery = false
+    var address: String = ""
 
+    @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var CFDLabel: UILabel!
 
     let udpSocketReceiveFilter: GCDAsyncUdpSocketReceiveFilterBlock = { (data, _, _) -> Bool in
@@ -35,13 +38,24 @@ class ViewController: UIViewController, GCDAsyncUdpSocketDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        findCFD()
+        self.findCFD()
+        self.textField.isHidden = true
+        self.textField.delegate = self
     }
 
     func findCFD() {
+        send("Who has CFD")
+        DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + disconnectAfter) {
+            if !self.stopDiscovery {
+                self.findCFD()
+            }
+        }
+    }
+
+    func send(_ message: String) {
         do {
             // close previous connections if any
-            if socket != nil {
+            if socket != nil && !socket.isClosed() {
                 socket.close()
             }
 
@@ -61,22 +75,17 @@ class ViewController: UIViewController, GCDAsyncUdpSocketDelegate {
             // set receive filter
             socket.setReceiveFilter(udpSocketReceiveFilter, with: ViewController.queue)
 
-            let data = "Who has CFD".data(using: .utf8)!
+            let data = message.data(using: .utf8)!
             socket.send(data,
                         toHost: broadcastHost,
                         port: broadcastPort,
                         withTimeout: broadcastTimeout,
                         tag: 0)
-
-            DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + disconnectAfter) {
-                if !self.stopDiscovery {
-                    self.findCFD()
-                }
-            }
         } catch {
-            print("Error setting up UDP listener \(error)")
+            print("Error sending UDP datagram \(error)")
         }
     }
+
 
     func extractCFDIPAddress(_ message: String) -> String? {
         let messageArray = message.components(separatedBy: "is at")
@@ -105,10 +114,13 @@ class ViewController: UIViewController, GCDAsyncUdpSocketDelegate {
         if let message = parsedData,
            let address = extractCFDIPAddress(message) {
             DispatchQueue.main.async{
+                self.address = address
                 self.CFDLabel.text = "CFD is connected at \(address)"
+                self.textField.isHidden = false
             }
-            socket.close()
+
             stopDiscovery = true
+            socket.close()
         }
     }
 
@@ -118,6 +130,19 @@ class ViewController: UIViewController, GCDAsyncUdpSocketDelegate {
 
     func udpSocketDidClose(_ sock: GCDAsyncUdpSocket, withError error: Error?) {
         print("UDP socket closed. Error \(error.debugDescription)")
+    }
+
+
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        let parameters: [String: AnyObject] = [
+            "data": self.textField.text as AnyObject
+        ]
+
+        AF.request("http://\(address):8080/cfd", method: .post, parameters: parameters).response { response in
+            debugPrint(response)
+        }
+
+        return true
     }
 }
 

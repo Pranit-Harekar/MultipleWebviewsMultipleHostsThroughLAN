@@ -32,6 +32,9 @@ android {
     buildFeatures {
         viewBinding true
     }
+    packagingOptions {
+        exclude 'META-INF/*'
+    }
 }
 
 dependencies {
@@ -47,5 +50,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
     // Networking
-    implementation("io.ktor:ktor-network:2.2.2")
+    implementation "io.ktor:ktor-network:2.2.2"
+    implementation "io.ktor:ktor-server-netty:2.2.2"
 }
