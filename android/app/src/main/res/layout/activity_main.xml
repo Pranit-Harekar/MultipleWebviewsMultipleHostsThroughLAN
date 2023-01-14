@@ -13,4 +13,10 @@
         android:gravity="center"
         android:text="@string/initial_instructions" />
 
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="gone"/>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

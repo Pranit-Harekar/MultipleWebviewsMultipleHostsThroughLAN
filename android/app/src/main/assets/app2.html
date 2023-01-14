@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>App 2</h2>
+<input name="message" type="text" maxlength="50" id="message" />
+<ul id="messages"></ul>
+<script>
+      // subscribe to messages
+      const bc1 = new BroadcastChannel("app_2");
+      bc1.onmessage = (event) => {
+        const node = document.createElement("li");
+        node.appendChild(document.createTextNode(event.data));
+        document.getElementById("messages").appendChild(node);
+      }
+    </script>
+</body>
+</html>
