@@ -8,8 +8,9 @@
 import UIKit
 import CocoaAsyncSocket
 import Alamofire
+import WebKit
 
-class ViewController: UIViewController, GCDAsyncUdpSocketDelegate, UITextFieldDelegate {
+class ViewController: UIViewController, GCDAsyncUdpSocketDelegate, WKScriptMessageHandler {
 
     static let queue = DispatchQueue(label: "com.pranitharekar.CFDDetector", attributes: [])
 
@@ -21,8 +22,10 @@ class ViewController: UIViewController, GCDAsyncUdpSocketDelegate, UITextFieldDe
     var stopDiscovery = false
     var address: String = ""
 
-    @IBOutlet weak var textField: UITextField!
+    var browserPlugin = "browserPlugin"
+
     @IBOutlet weak var CFDLabel: UILabel!
+    @IBOutlet weak var webview: WKWebView!
 
     let udpSocketReceiveFilter: GCDAsyncUdpSocketReceiveFilterBlock = { (data, _, _) -> Bool in
         let message = String(data: data, encoding: .utf8)
@@ -38,9 +41,11 @@ class ViewController: UIViewController, GCDAsyncUdpSocketDelegate, UITextFieldDe
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
         self.findCFD()
-        self.textField.isHidden = true
-        self.textField.delegate = self
+
+        self.webview.isHidden = true
+        self.loadInitialPage()
     }
 
     func findCFD() {
@@ -116,7 +121,7 @@ class ViewController: UIViewController, GCDAsyncUdpSocketDelegate, UITextFieldDe
             DispatchQueue.main.async{
                 self.address = address
                 self.CFDLabel.text = "CFD is connected at \(address)"
-                self.textField.isHidden = false
+                self.webview.isHidden = false
             }
 
             stopDiscovery = true
@@ -132,17 +137,40 @@ class ViewController: UIViewController, GCDAsyncUdpSocketDelegate, UITextFieldDe
         print("UDP socket closed. Error \(error.debugDescription)")
     }
 
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        if message.name == browserPlugin {
+            let parameters: [String: AnyObject] = [
+                "data": message.body as AnyObject
+            ]
 
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        let parameters: [String: AnyObject] = [
-            "data": self.textField.text as AnyObject
-        ]
+            AF.request("http://\(address):8080/cfd", method: .post, parameters: parameters).response { response in
+                debugPrint(response)
+            }
 
-        AF.request("http://\(address):8080/cfd", method: .post, parameters: parameters).response { response in
-            debugPrint(response)
+        }}
+
+    private func loadInitialPage() {
+        do {
+            guard let filePath = Bundle.main.path(forResource: "app1", ofType: "html") else {
+                print("File reading error")
+                return
+            }
+
+            let contents =  try String(contentsOfFile: filePath, encoding: .utf8)
+            let baseUrl = URL(fileURLWithPath: filePath)
+            webview.loadHTMLString(contents as String, baseURL: baseUrl)
+            webview.configuration.preferences.javaScriptEnabled = true
+
+            let js: String = "const bc2 = new BroadcastChannel(\"app_1\"); bc2.onmessage = (event) => { window.webkit.messageHandlers.\(browserPlugin).postMessage(event.data);};"
+            let script = WKUserScript(source: js, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
+            webview.configuration.userContentController.addUserScript(script)
+
+            webview.configuration.userContentController = WKUserContentController()
+            webview.configuration.userContentController.add(self, name: browserPlugin)
         }
-
-        return true
+        catch {
+            print("File HTML error")
+        }
     }
 }
 

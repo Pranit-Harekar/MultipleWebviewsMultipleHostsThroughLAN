@@ -1,5 +1,6 @@
 package com.pranitharekar.android
 
+import android.util.Log
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -10,13 +11,14 @@ import io.ktor.server.request.*
 class HTTPServer() {
     private lateinit var server: NettyApplicationEngine
 
-    fun start(host: String, port: Int, log: (String) -> Unit) {
+    fun start(host: String, port: Int, onReceive: (String) -> Unit) {
         server = embeddedServer(Netty, port, host) {
             routing {
                 get("/cfd") {
                     val response = "Hello, world!"
                     call.respondText(response)
-                    log("received GET '/' request")
+                    Log.d("HTTPSERVER", "received GET '/' request")
+                    onReceive("")
                 }
 
                 post("/cfd") {
@@ -24,7 +26,8 @@ class HTTPServer() {
                     call.respondText(response)
                     val requestBody = call.receiveParameters()
                     val data = requestBody["data"]
-                    log("received POST '/cfd' request with '$data'")
+                    Log.d("HTTPSERVER", "received POST '/cfd' request with '$data'")
+                    onReceive("$data")
                 }
             }
         }

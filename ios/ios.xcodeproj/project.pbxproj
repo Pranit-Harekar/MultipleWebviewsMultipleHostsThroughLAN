@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		645D33E22972108C0061BC28 /* String+isValidIpAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645D33E12972108C0061BC28 /* String+isValidIpAddress.swift */; };
+		645D33E4297355FA0061BC28 /* app1.html in Resources */ = {isa = PBXBuildFile; fileRef = 645D33E3297355FA0061BC28 /* app1.html */; };
 		64CEF3C5297201D90030861A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64CEF3C4297201D90030861A /* AppDelegate.swift */; };
 		64CEF3C7297201D90030861A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64CEF3C6297201D90030861A /* SceneDelegate.swift */; };
 		64CEF3C9297201D90030861A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64CEF3C8297201D90030861A /* ViewController.swift */; };
@@ -45,6 +46,7 @@
 		5A002F231D617C27BE3B6B58 /* Pods-ios-iosUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios-iosUITests.debug.xcconfig"; path = "Target Support Files/Pods-ios-iosUITests/Pods-ios-iosUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		5D1D243C7589F5423690C381 /* Pods_iosTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iosTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		645D33E12972108C0061BC28 /* String+isValidIpAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+isValidIpAddress.swift"; sourceTree = "<group>"; };
+		645D33E3297355FA0061BC28 /* app1.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = app1.html; sourceTree = "<group>"; };
 		64CEF3C1297201D90030861A /* ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		64CEF3C4297201D90030861A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		64CEF3C6297201D90030861A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -122,6 +124,7 @@
 				64CEF3C6297201D90030861A /* SceneDelegate.swift */,
 				645D33E12972108C0061BC28 /* String+isValidIpAddress.swift */,
 				64CEF3C8297201D90030861A /* ViewController.swift */,
+				645D33E3297355FA0061BC28 /* app1.html */,
 				64CEF3CA297201D90030861A /* Main.storyboard */,
 				64CEF3CD297201DB0030861A /* Assets.xcassets */,
 				64CEF3CF297201DB0030861A /* LaunchScreen.storyboard */,
@@ -281,6 +284,7 @@
 			files = (
 				64CEF3D1297201DB0030861A /* LaunchScreen.storyboard in Resources */,
 				64CEF3CE297201DB0030861A /* Assets.xcassets in Resources */,
+				645D33E4297355FA0061BC28 /* app1.html in Resources */,
 				64CEF3CC297201D90030861A /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
